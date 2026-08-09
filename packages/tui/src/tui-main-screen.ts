@@ -207,23 +207,23 @@ export class TuiMainScreen extends TuiBase implements TUI {
 		newLines = this.applyLineResets(newLines);
 
 		// Helper to clear scrollback and viewport and render all new lines
-	const fullRender = (clear: boolean): void => {
-		// PI_NO_FULL_CLEAR=1: skip screen clear, but still home cursor for correct positioning
-		const actualClear = clear && process.env.PI_NO_FULL_CLEAR !== "1";
-		this.fullRedrawCount += 1;
-		let buffer = "\x1b[?2026h"; // Begin synchronized output
-		if (actualClear) {
-			buffer += this.deleteKittyImages(this.previousKittyImageIds);
-			buffer += "\x1b[2J\x1b[H"; // Clear screen + home
-			// Only clear scrollback if PI_NO_SCROLLBACK_CLEAR is not set
-			// Setting PI_NO_SCROLLBACK_CLEAR=1 preserves terminal scrollback during full redraws
-			if (process.env.PI_NO_SCROLLBACK_CLEAR !== "1") {
-				buffer += "\x1b[3J"; // Clear scrollback
+		const fullRender = (clear: boolean): void => {
+			// PI_NO_FULL_CLEAR=1: skip screen clear, but still home cursor for correct positioning
+			const actualClear = clear && process.env.PI_NO_FULL_CLEAR !== "1";
+			this.fullRedrawCount += 1;
+			let buffer = "\x1b[?2026h"; // Begin synchronized output
+			if (actualClear) {
+				buffer += this.deleteKittyImages(this.previousKittyImageIds);
+				buffer += "\x1b[2J\x1b[H"; // Clear screen + home
+				// Only clear scrollback if PI_NO_SCROLLBACK_CLEAR is not set
+				// Setting PI_NO_SCROLLBACK_CLEAR=1 preserves terminal scrollback during full redraws
+				if (process.env.PI_NO_SCROLLBACK_CLEAR !== "1") {
+					buffer += "\x1b[3J"; // Clear scrollback
+				}
+			} else if (clear) {
+				// PI_NO_FULL_CLEAR mode: home cursor without clearing screen
+				buffer += "\x1b[H"; // Cursor home only
 			}
-		} else if (clear) {
-			// PI_NO_FULL_CLEAR mode: home cursor without clearing screen
-			buffer += "\x1b[H"; // Cursor home only
-		}
 			for (let i = 0; i < newLines.length; i++) {
 				if (i > 0) buffer += "\r\n";
 				const line = newLines[i];

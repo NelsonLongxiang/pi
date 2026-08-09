@@ -236,8 +236,8 @@ export class FooterComponent implements Component {
 				.sort(([a], [b]) => a.localeCompare(b))
 				.map(([, text]) => sanitizeStatusText(text));
 			// If any status starts with ~, put it on a separate line
-			const primary = sortedStatuses.filter(s => !s.startsWith("~"));
-			const secondary = sortedStatuses.filter(s => s.startsWith("~")).map(s => s.slice(1));
+			const primary = sortedStatuses.filter((s) => !s.startsWith("~"));
+			const secondary = sortedStatuses.filter((s) => s.startsWith("~")).map((s) => s.slice(1));
 			if (primary.length > 0) {
 				const statusLine = primary.join(" ");
 				lines.push(truncateToWidth(statusLine, width, theme.fg("dim", "...")));

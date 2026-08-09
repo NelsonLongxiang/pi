@@ -108,19 +108,20 @@ export class AssistantMessageComponent extends Container {
 			if (content.type === "text" && content.text.trim()) {
 				// Assistant text messages with no background - trim the text
 				// Set paddingY=0 to avoid extra spacing before tool executions
-			let textContent = content.text.trim();
-			// Limit displayed lines if PI_MAX_MESSAGE_LINES is set
-			if (maxLines > 0) {
-				const lines = textContent.split("\n");
-				if (lines.length > maxLines) {
-					textContent = lines.slice(0, maxLines).join("\n") + `\n... (${lines.length - maxLines} more lines hidden)`;
+				let textContent = content.text.trim();
+				// Limit displayed lines if PI_MAX_MESSAGE_LINES is set
+				if (maxLines > 0) {
+					const lines = textContent.split("\n");
+					if (lines.length > maxLines) {
+						textContent =
+							lines.slice(0, maxLines).join("\n") + `\n... (${lines.length - maxLines} more lines hidden)`;
+					}
 				}
-			}
-			this.contentContainer.addChild(
-				new Markdown(textContent, this.outputPad, 0, this.markdownTheme, undefined, {
-					transform: createMarkdownTransform("assistant", this.isStreaming, this.markdownTransformers),
-				}),
-			);
+				this.contentContainer.addChild(
+					new Markdown(textContent, this.outputPad, 0, this.markdownTheme, undefined, {
+						transform: createMarkdownTransform("assistant", this.isStreaming, this.markdownTransformers),
+					}),
+				);
 			} else if (content.type === "thinking") {
 				const thinkingBlocks: string[] = [];
 				for (; i < message.content.length; i++) {

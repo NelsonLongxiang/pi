@@ -3177,7 +3177,7 @@ export class InteractiveMode {
 				}
 				break;
 
-			case "message_end":
+			case "message_end": {
 				if (event.message.role === "user") break;
 				if (this.streamingComponent && event.message.role === "assistant") {
 					this.streamingMessage = event.message;
@@ -3224,6 +3224,7 @@ export class InteractiveMode {
 				}
 				this.ui.requestRender();
 				break;
+			}
 
 			case "bash_execution_update":
 				// The bash execution callback handles TUI output rendering.

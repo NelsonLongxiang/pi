@@ -434,7 +434,11 @@ export class Editor implements Component, Focusable {
 		// Capture state when first entering history browsing mode
 		if (this.historyIndex === -1 && newIndex >= 0) {
 			this.pushUndoSnapshot();
-			const snap = { lines: [...this.state.lines], cursorLine: this.state.cursorLine, cursorCol: this.state.cursorCol };
+			const snap = {
+				lines: [...this.state.lines],
+				cursorLine: this.state.cursorLine,
+				cursorCol: this.state.cursorCol,
+			};
 			this.historyDraft = snap as any;
 		}
 
