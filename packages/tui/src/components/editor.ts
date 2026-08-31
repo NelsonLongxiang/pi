@@ -837,11 +837,9 @@ export class Editor implements Component, Focusable {
 
 		// Arrow key navigation (with history support)
 		if (kb.matches(data, "tui.editor.cursorUp")) {
-			// Single-line editor: browse history directly regardless of cursor position
-			const isSingleLine = this.state.lines.length <= 1;
 			if (
 				this.isOnFirstVisualLine() &&
-				(isSingleLine || this.isEditorEmpty() || this.historyIndex > -1 || this.state.cursorCol === 0)
+				(this.isEditorEmpty() || this.historyIndex > -1 || this.state.cursorCol === 0)
 			) {
 				this.navigateHistory(-1);
 			} else if (this.isOnFirstVisualLine()) {

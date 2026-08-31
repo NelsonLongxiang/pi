@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
-import { type Component, TUI } from "../src/tui.ts";
+import type { Component } from "../src/tui.ts";
+import { TuiMainScreen } from "../src/tui-main-screen.ts";
 import { VirtualTerminal } from "./virtual-terminal.ts";
 
 class MutableLines implements Component {
@@ -32,7 +33,7 @@ describe("above-viewport change must not nuke scrollback", () => {
 			origWrite(d);
 		};
 
-		const tui = new TUI(vt);
+		const tui = new TuiMainScreen(vt);
 		const content = new MutableLines(Array.from({ length: 30 }, (_, i) => `L${String(i).padStart(2, "0")}`));
 		tui.addChild(content);
 		tui.start();
@@ -66,7 +67,7 @@ describe("above-viewport change must not nuke scrollback", () => {
 			origWrite(d);
 		};
 
-		const tui = new TUI(vt);
+		const tui = new TuiMainScreen(vt);
 		const content = new MutableLines(Array.from({ length: 30 }, (_, i) => `L${String(i).padStart(2, "0")}`));
 		tui.addChild(content);
 		tui.start();
@@ -99,7 +100,7 @@ describe("above-viewport change must not nuke scrollback", () => {
 			origWrite(d);
 		};
 
-		const tui = new TUI(vt);
+		const tui = new TuiMainScreen(vt);
 		const content = new MutableLines(Array.from({ length: 30 }, (_, i) => `L${String(i).padStart(2, "0")}`));
 		tui.addChild(content);
 		tui.start();
