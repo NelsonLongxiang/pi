@@ -42,3 +42,10 @@ plans/
 .pi/hf-sessions/
 .pi/hf-sessions-backup/
 collect.sh
+
+# pi runtime artifacts
+packages/coding-agent/theme/
+
+# stray pnpm artifacts (pi uses bun)
+pnpm-lock.yaml
+pnpm-workspace.yaml
