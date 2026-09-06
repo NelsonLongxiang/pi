@@ -49,3 +49,4 @@ packages/coding-agent/theme/
 # stray pnpm artifacts (pi uses bun)
 pnpm-lock.yaml
 pnpm-workspace.yaml
+yuanguang
