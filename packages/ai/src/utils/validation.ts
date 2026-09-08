@@ -292,7 +292,9 @@ function allowedValuesHint(error: TLocalizedValidationError, schema: JsonSchemaO
 	let node: JsonSchemaObject | undefined = schema;
 	for (const segment of error.instancePath.split("/").filter(Boolean)) {
 		if (node.type === "array" && node.items) {
-			node = Array.isArray(node.items) ? (node.items as JsonSchemaObject[])[Number(segment)] : (node.items as JsonSchemaObject);
+			node = Array.isArray(node.items)
+				? (node.items as JsonSchemaObject[])[Number(segment)]
+				: (node.items as JsonSchemaObject);
 		} else {
 			node = node.properties?.[segment];
 		}
@@ -305,7 +307,10 @@ function allowedValuesHint(error: TLocalizedValidationError, schema: JsonSchemaO
 		return "";
 	}
 	const MAX_LISTED = 20;
-	const listed = values.slice(0, MAX_LISTED).map((v) => JSON.stringify(v)).join(", ");
+	const listed = values
+		.slice(0, MAX_LISTED)
+		.map((v) => JSON.stringify(v))
+		.join(", ");
 	const overflow = values.length > MAX_LISTED ? ` …(${values.length - MAX_LISTED} more)` : "";
 	return ` (allowed: ${listed}${overflow})`;
 }
@@ -372,7 +377,10 @@ export function validateToolArguments(tool: Tool, toolCall: ToolCall): any {
 	const errors =
 		validator
 			.Errors(args)
-			.map((error) => `  - ${formatValidationPath(error)}: ${error.message}${allowedValuesHint(error, tool.parameters as JsonSchemaObject)}`)
+			.map(
+				(error) =>
+					`  - ${formatValidationPath(error)}: ${error.message}${allowedValuesHint(error, tool.parameters as JsonSchemaObject)}`,
+			)
 			.join("\n") || "Unknown validation error";
 
 	const errorMessage = `Validation failed for tool "${toolCall.name}":\n${errors}\n\nReceived arguments:\n${JSON.stringify(toolCall.arguments, null, 2)}`;
