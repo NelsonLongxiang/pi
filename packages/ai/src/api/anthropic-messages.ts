@@ -1216,10 +1216,15 @@ function buildParams(
 	const betaFeatures = getBetaFeatures(model, context, isOAuthToken, nativeToolChanges, options);
 	const params: MessageCreateParamsStreaming = {
 		model: model.id,
+		// Thinking disabled 后必须剥离历史 thinking 块（Anthropic 400: "must be passed back"）。
+		// 收窄到 Anthropic 本体：兼容商（xiaomi/Vercel/Fireworks）须回放 thinking 历史
+		// （上游 #9676/#9323，empty-signature compat 套件钉住该契约）。
 		messages:
 			model.compat?.supportsMidConvoEffort === true
 				? insertThinkingLevelMessages(converted, activeEffort)
-				: converted.messages,
+				: options?.thinkingEnabled === false && model.provider === "anthropic"
+					? stripThinkingBlocks(converted.messages)
+					: converted.messages,
 		max_tokens: options?.maxTokens ?? model.maxTokens,
 		stream: true,
 		...(betaFeatures.length > 0 ? { betas: betaFeatures } : {}),
@@ -1687,4 +1692,13 @@ function mapStopReason(
 			// Handle unknown stop reasons gracefully (API may add new values)
 			throw new Error(`Unhandled stop reason: ${reason}`);
 	}
+}
+
+/** 剥离 assistant 历史消息中的 thinking/redacted_thinking 块（thinking disabled 专用）。 */
+function stripThinkingBlocks(messages: MessageParam[]): MessageParam[] {
+	return messages.map((msg) => {
+		if (msg.role !== "assistant" || !Array.isArray(msg.content)) return msg;
+		const blocks = msg.content.filter((b) => b.type !== "thinking" && b.type !== "redacted_thinking");
+		return blocks.length === msg.content.length ? msg : { ...msg, content: blocks };
+	});
 }
