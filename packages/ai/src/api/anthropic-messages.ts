@@ -1077,7 +1077,12 @@ function buildParams(
 	// thinking 块必须剥离——Anthropic 在 thinking.type=disabled 下拒绝任何 thinking 块
 	// （400: "content[].thinking ... must be passed back"）。adaptive 路径有
 	// prefix_mismatch_behavior=drop_block 兜底，非 adaptive 的 disabled 路径此前没有。
-	const thinkingDisabled = options?.thinkingEnabled === false && model.compat?.supportsMidConvoEffort !== true;
+	// 收窄到 Anthropic 本体（评审 bounce：兼容端 xiaomi-token-plan-ams/Vercel/Fireworks
+	// 须回放 thinking 历史——上游 #9676/#9323 契约，anthropic-empty-signature 9 红用例）。
+	const thinkingDisabled =
+		options?.thinkingEnabled === false &&
+		model.compat?.supportsMidConvoEffort !== true &&
+		model.provider === "anthropic";
 	const params: MessageCreateParamsStreaming = {
 		model: model.id,
 		messages:
