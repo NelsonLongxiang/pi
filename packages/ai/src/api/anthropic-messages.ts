@@ -1073,12 +1073,19 @@ function buildParams(
 	);
 	const activeEffort = options?.effort ?? "high";
 	const betaFeatures = getBetaFeatures(model, context, isOAuthToken, nativeToolChanges, options);
+	// Thinking disabled（会话曾开 thinking 后关闭/模型切换）：历史 assistant 消息里的
+	// thinking 块必须剥离——Anthropic 在 thinking.type=disabled 下拒绝任何 thinking 块
+	// （400: "content[].thinking ... must be passed back"）。adaptive 路径有
+	// prefix_mismatch_behavior=drop_block 兜底，非 adaptive 的 disabled 路径此前没有。
+	const thinkingDisabled = options?.thinkingEnabled === false && model.compat?.supportsMidConvoEffort !== true;
 	const params: MessageCreateParamsStreaming = {
 		model: model.id,
 		messages:
 			model.compat?.supportsMidConvoEffort === true
 				? insertThinkingLevelMessages(converted, activeEffort)
-				: converted.messages,
+				: thinkingDisabled
+					? stripThinkingBlocks(converted.messages)
+					: converted.messages,
 		max_tokens: options?.maxTokens ?? model.maxTokens,
 		stream: true,
 		...(betaFeatures.length > 0 ? { betas: betaFeatures } : {}),
@@ -1231,6 +1238,15 @@ function convertToolResult(msg: ToolResultMessage): ContentBlockParam {
 interface ConvertedAnthropicMessages {
 	messages: MessageParam[];
 	assistantLevels: Map<number, AnthropicEffort>;
+}
+
+/** 剥离 assistant 历史消息中的 thinking/redacted_thinking 块（disabled 模式专用）。 */
+function stripThinkingBlocks(messages: MessageParam[]): MessageParam[] {
+	return messages.map((msg) => {
+		if (msg.role !== "assistant" || !Array.isArray(msg.content)) return msg;
+		const blocks = msg.content.filter((b) => b.type !== "thinking" && b.type !== "redacted_thinking");
+		return blocks.length === msg.content.length ? msg : { ...msg, content: blocks };
+	});
 }
 
 function convertMessages(
