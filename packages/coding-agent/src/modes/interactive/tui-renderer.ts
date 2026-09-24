@@ -38,8 +38,8 @@ export function createInteractiveTui(options: InteractiveTuiOptions): TuiMainScr
 				try {
 					await copyToClipboard(text);
 					return true;
-				} catch (error) {
-					return error instanceof Error ? error.message : String(error);
+				} catch {
+					return false; // pi-tui 契约是 Promise<boolean>——旧版返回错误串类型不符
 				}
 			},
 		});
