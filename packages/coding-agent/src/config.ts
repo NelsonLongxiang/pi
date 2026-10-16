@@ -529,11 +529,21 @@ export function getShareViewerUrl(gistId: string): string {
 // User Config Paths (~/.pi/agent/*)
 // =============================================================================
 
-/** Get the agent config directory (e.g., ~/.pi/agent/) */
+/** Get path to user's agent config directory.
+ *
+ * yuanguang fork 默认（2026-09-30 龙翔拍板硬编码）：缺省 agent 目录从上游的
+ * ~/.pi/agent 改为 ~/.expert-teams/history——系统级布局单一事实源，免除
+ * 「裸跑忘 export PI_CODING_AGENT_DIR → models/extensions/sessions 三分裂」
+ * 故障族（junction 兜底仅开发机补丁，正解是缺省即正确）。
+ * 上游行为可用 YUANGUANG_UPSTREAM_AGENT_DIR=1 显式找回（sync 冲突排查用）。
+ */
 export function getAgentDir(): string {
 	const envDir = process.env[ENV_AGENT_DIR];
 	if (envDir) {
 		return expandTildePath(envDir);
+	}
+	if (!process.env.YUANGUANG_UPSTREAM_AGENT_DIR) {
+		return join(homedir(), ".expert-teams", "history");
 	}
 	return join(homedir(), CONFIG_DIR_NAME, "agent");
 }
